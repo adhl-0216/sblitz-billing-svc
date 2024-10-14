@@ -73,9 +73,10 @@ erDiagram
     }
 
     MEMBERS {
-        string id PK
-        int bill_id FK "References BILLS(id)"
-        string color_code
+        id uuid
+        bill_id integer REFERENCES BILLS(id)"
+        color_code text
+        PRIMARY_KEY(id, bill_id)
     }
 
     SPLIT {
