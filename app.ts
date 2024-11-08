@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { devConfig, Config } from './config';
 
 
-function createApp(config: Config) {
+function AppFactory(config: Config) {
   const app = express();
   const PORT = config.port || 3000;
 
@@ -37,4 +37,4 @@ function createApp(config: Config) {
   return app;
 }
 
-createApp(devConfig);
+AppFactory(devConfig);
