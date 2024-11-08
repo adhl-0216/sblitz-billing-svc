@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
-import { devConfig, Config } from './config';
+import { get_config } from './util';
 
 
-function AppFactory(config: Config) {
+function AppFactory() {
   const app = express();
-  const PORT = config.port || 3000;
+  const config = get_config()
+  const PORT = config.port
 
   app.post("/bill", (req: Request, res: Response) => {
 
@@ -37,4 +38,4 @@ function AppFactory(config: Config) {
   return app;
 }
 
-AppFactory(devConfig);
+AppFactory();
