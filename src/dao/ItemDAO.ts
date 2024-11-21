@@ -1,4 +1,3 @@
-// dao/ItemDAO.ts
 import { Pool } from 'pg';
 import { Item } from '../models/Item';
 

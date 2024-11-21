@@ -69,6 +69,7 @@ erDiagram
         string id PK
         int bill_id FK "References BILLS(id)"
         string name
+        string split_type
         float price
     }
 
