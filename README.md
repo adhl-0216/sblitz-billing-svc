@@ -55,41 +55,42 @@ classDiagram
 title: ERD
 ---
 erDiagram
+    BILLS ||--o{ BILL_ITEMS : contains
+    BILLS ||--o{ BILL_MEMBERS : has
+    BILL_ITEMS ||--o{ ITEM_SPLIT : splits_into
+    BILL_MEMBERS ||--o{ ITEM_SPLIT : assigned_to
+
     BILLS {
-        string id PK
-        string title
-        string description
-        uuid created_by FK "References MEMBERS(id)"
-        float total_amount
-        datetime created_at
-        datetime updated_at
+        UUID id PK
+        VARCHAR title
+        TEXT description
+        VARCHAR currency
+        NUMERIC total_amount
+        UUID owner_id
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     BILL_ITEMS {
-        string id PK
-        int bill_id FK "References BILLS(id)"
-        string name
-        string split_type
-        float price
+        UUID id PK
+        UUID bill_id FK
+        VARCHAR name
+        NUMERIC price
+        SPLIT_TYPE split_type
     }
 
-    MEMBERS {
-        id uuid
-        bill_id integer REFERENCES BILLS(id)"
-        color_code text
-        PRIMARY_KEY(id, bill_id)
+    BILL_MEMBERS {
+        UUID id PK
+        UUID bill_id FK
+        VARCHAR color_code
     }
 
-    SPLIT {
-        string id PK
-        int bill_item_id FK "References BILL_ITEMS(id)"
-        uuid assignee_id FK "References MEMBERS(id)"
-        number amount
+    ITEM_SPLIT {
+        UUID id PK
+        UUID bill_item_id FK
+        UUID assignee_id FK
+        NUMERIC split_value
     }
-
-    BILLS ||--|{ BILL_ITEMS : "has"
-    BILLS ||--|{ MEMBERS : "includes"
-    BILL_ITEMS ||--|{ SPLIT : "assigned to"
 ```
 
 Note:
