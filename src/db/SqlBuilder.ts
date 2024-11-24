@@ -7,24 +7,25 @@ export interface SQLBuilder {
 
 export class PostgresSQLBuilder implements SQLBuilder {
     insert(table: string, columns: string[]): string {
-        return "INSERT"
+        const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
+        return `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`;
     }
 
     update(table: string, columns: string[], whereClause: string): string {
-        return "SET"
+        const setClause = columns.map((col, index) => `${col} = $${index + 1}`).join(', ');
+        return `UPDATE ${table} SET ${setClause} WHERE ${whereClause} RETURNING *`;
     }
 
     delete(table: string, whereClause: string): string {
-        return "DELETE"
-
+        return `DELETE FROM ${table} WHERE ${whereClause}`;
     }
 
     select(table: string, columns: string[], whereClause?: string): string {
-        return "SELECT"
-
+        const baseQuery = `SELECT ${columns.join(', ')} FROM ${table}`;
+        return whereClause ? `${baseQuery} WHERE ${whereClause}` : baseQuery;
     }
-    // Implement PostgreSQL-specific SQL building methods
 }
+
 
 export class OracleSQLBuilder implements SQLBuilder {
     // Implement Oracle-specific SQL building methods

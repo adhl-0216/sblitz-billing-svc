@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { BillService } from '@/services/BillService';
+import { UUID } from 'crypto';
 
 export class BillController {
     constructor(private billService: BillService) { }
@@ -37,7 +38,8 @@ export class BillController {
 
     async getBillById(req: Request, res: Response) {
         try {
-            const bill = await this.billService.getBillById(req.params.billId);
+            const billId = req.params.billId as UUID
+            const bill = await this.billService.getBillById(billId);
             if (bill) {
                 res.json(bill);
             } else {

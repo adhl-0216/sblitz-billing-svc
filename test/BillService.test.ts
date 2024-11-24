@@ -1,8 +1,11 @@
 import { BillService } from '@/services/BillService';
 import { BillDAO } from '@/dao/BillDAO';
 import { Bill } from '@/models/Bill';
+import { Item } from '@/models/Item';
+import { Member } from '@/models/Member';
+import { randomUUID } from 'crypto';
 
-jest.mock('@/dao/BillDAO'); // Mock the BillDAO
+jest.mock('@/dao/BillDAO');
 
 describe('BillService', () => {
     let billService: BillService;
@@ -14,78 +17,135 @@ describe('BillService', () => {
     });
 
     afterEach(() => {
-        jest.clearAllMocks(); // Clear mock calls and instances after each test
+        jest.clearAllMocks();
     });
 
     it('should fetch all bills', async () => {
         const mockBills: Bill[] = [
-            { id: '1', title: 'Bill 1', description: 'Description 1', currency: 'USD', total_amount: 100, created_at: new Date(), updated_at: new Date() },
-            { id: '2', title: 'Bill 2', description: 'Description 2', currency: 'USD', total_amount: 200, created_at: new Date(), updated_at: new Date() },
+            {
+                id: randomUUID(),
+                title: 'Bill 1',
+                description: 'Description 1',
+                currency: 'USD',
+                total_amount: 100,
+                owner_id: randomUUID(),
+                created_at: new Date(),
+                updated_at: new Date(),
+                items: [],
+                members: []
+            },
+            {
+                id: randomUUID(),
+                title: 'Bill 2',
+                description: 'Description 2',
+                currency: 'USD',
+                total_amount: 200,
+                owner_id: randomUUID(),
+                created_at: new Date(),
+                updated_at: new Date(),
+                items: [],
+                members: []
+            },
         ];
 
-        billDAOMock.getAll.mockResolvedValue(mockBills); // Mock implementation
+        billDAOMock.getAll.mockResolvedValue(mockBills);
 
         const bills = await billService.getAllBills();
 
         expect(bills).toEqual(mockBills);
-        expect(billDAOMock.getAll).toHaveBeenCalledTimes(1); // Ensure getAll was called once
+        expect(billDAOMock.getAll).toHaveBeenCalledTimes(1);
     });
 
     it('should create a new bill', async () => {
-        const newBillData = { title: 'New Bill', description: 'New Description', currency: 'USD', total_amount: 150 };
-        const createdBill: Bill = { id: '3', ...newBillData, created_at: new Date(), updated_at: new Date() };
+        const newBillData = {
+            title: 'New Bill',
+            description: 'New Description',
+            currency: 'USD',
+            total_amount: 150,
+            owner_id: randomUUID(),
+            items: [] as Item[],
+            members: [] as Member[]
+        };
+        const createdBill: Bill = {
+            id: randomUUID(),
+            ...newBillData,
+            created_at: new Date(),
+            updated_at: new Date()
+        };
 
-        billDAOMock.create.mockResolvedValue(createdBill); // Mock implementation
+        billDAOMock.create.mockResolvedValue(createdBill);
 
         const result = await billService.createBill(newBillData);
 
         expect(result).toEqual(createdBill);
-        expect(billDAOMock.create).toHaveBeenCalledWith(newBillData); // Ensure create was called with correct data
+        expect(billDAOMock.create).toHaveBeenCalledWith(newBillData);
     });
 
     it('should fetch a bill by ID', async () => {
-        const mockBillId = '1';
-        const mockBill: Bill = { id: mockBillId, title: 'Mock Bill', description: 'Mock Description', currency: 'USD', total_amount: 100, created_at: new Date(), updated_at: new Date() };
+        const mockBillId = randomUUID();
+        const mockBill: Bill = {
+            id: mockBillId,
+            title: 'Mock Bill',
+            description: 'Mock Description',
+            currency: 'USD',
+            total_amount: 100,
+            owner_id: randomUUID(),
+            created_at: new Date(),
+            updated_at: new Date(),
+            items: [],
+            members: []
+        };
 
-        billDAOMock.getById.mockResolvedValue(mockBill); // Mock implementation
+        billDAOMock.getById.mockResolvedValue(mockBill);
 
         const bill = await billService.getBillById(mockBillId);
 
         expect(bill).toEqual(mockBill);
-        expect(billDAOMock.getById).toHaveBeenCalledWith(mockBillId); // Ensure getById was called with correct ID
+        expect(billDAOMock.getById).toHaveBeenCalledWith(mockBillId);
     });
 
     it('should return null if bill not found by ID', async () => {
-        const mockBillId = '999'; // Non-existent ID
-        billDAOMock.getById.mockResolvedValue(null); // Mock implementation
+        const mockBillId = randomUUID();
+        billDAOMock.getById.mockResolvedValue(null);
 
         const bill = await billService.getBillById(mockBillId);
 
         expect(bill).toBeNull();
-        expect(billDAOMock.getById).toHaveBeenCalledWith(mockBillId); // Ensure getById was called with correct ID
+        expect(billDAOMock.getById).toHaveBeenCalledWith(mockBillId);
     });
 
     it('should update a bill by ID', async () => {
-        const mockBillId = '1';
+        const mockBillId = randomUUID();
         const updatedData = { title: 'Updated Title' };
-        const updatedBill: Bill = { id: mockBillId, title: 'Updated Title', description: 'Mock Description', currency: 'USD', total_amount: 100, created_at: new Date(), updated_at: new Date() };
+        const updatedBill: Bill = {
+            id: mockBillId,
+            title: 'Updated Title',
+            description: 'Mock Description',
+            currency: 'USD',
+            total_amount: 100,
+            owner_id: randomUUID(),
+            created_at: new Date(),
+            updated_at: new Date(),
+            items: [],
+            members: []
+        };
 
-        billDAOMock.update.mockResolvedValue(updatedBill); // Mock implementation
+        billDAOMock.update.mockResolvedValue(updatedBill);
 
         const result = await billService.updateBill(mockBillId, updatedData);
 
         expect(result).toEqual(updatedBill);
-        expect(billDAOMock.update).toHaveBeenCalledWith(mockBillId, updatedData); // Ensure update was called with correct data
+        expect(billDAOMock.update).toHaveBeenCalledWith(mockBillId, updatedData);
     });
 
     it('should delete a bill by ID', async () => {
-        const mockBillId = '1';
+        const mockBillId = randomUUID();
 
-        billDAOMock.delete.mockResolvedValue(true); // Mock implementation
+        billDAOMock.delete.mockResolvedValue(true);
 
         const result = await billService.deleteBill(mockBillId);
 
         expect(result).toBe(true);
-        expect(billDAOMock.delete).toHaveBeenCalledWith(mockBillId); // Ensure delete was called with correct ID
+        expect(billDAOMock.delete).toHaveBeenCalledWith(mockBillId);
     });
 });

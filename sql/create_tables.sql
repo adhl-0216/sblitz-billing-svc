@@ -48,9 +48,7 @@ CREATE TABLE ITEM_SPLIT (
     id UUID DEFAULT gen_random_uuid(),
     bill_item_id UUID NOT NULL,
     assignee_id UUID NOT NULL,
-    amount NUMERIC(12,2) NOT NULL,
-    pct NUMERIC(5,2) NOT NULL,
-    share INTEGER NOT NULL,
+    split_value NUMERIC(12,2) NOT NULL,
     CONSTRAINT pk_split PRIMARY KEY (id),
     CONSTRAINT fk_split_bill_item FOREIGN KEY (bill_item_id) REFERENCES BILL_ITEMS(id) ON DELETE CASCADE,
     CONSTRAINT fk_split_assignee FOREIGN KEY (assignee_id) REFERENCES BILL_MEMBERS(id) ON DELETE CASCADE

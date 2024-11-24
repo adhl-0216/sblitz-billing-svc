@@ -1,15 +1,14 @@
-export class Split {
-    id: string; // Unique identifier for the split
-    billItemId: string; // The ID of the associated bill item
-    assigneeId: string; // The ID of the user assigned to this split
-    amount: number; // The amount assigned to the user
+import { UUID } from "crypto";
+import { Member } from "./Member";
 
-    constructor(id: string, billItemId: string, assigneeId: string, amount: number) {
-        this.id = id;
-        this.billItemId = billItemId;
-        this.assigneeId = assigneeId;
-        this.amount = amount;
+export class Split {
+    id: UUID
+    assignee: Member;
+    value: number;
+
+    constructor(assignee: Member, value: number) {
+        this.assignee = assignee;
+        this.value = value;
     }
 
-    // Additional methods or business logic for Split can be added here
 }

@@ -1,47 +1,30 @@
-import { Pool } from 'pg';
+import { Split } from "@/models/Split";
+import { IDAO } from "./IDAO";
+import { DatabaseConnection } from "@/db/Connection";
+import { SQLBuilder } from "@/db/SqlBuilder";
+import { AbstractDatabaseFactory } from "@/db/Factory";
 
-const pool = new Pool({
-    user: process.env.POSTGRES_USER,
-    host: 'localhost',
-    database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_PASSWORD,
-    port: 5432,
-});
+export class SplitDAO implements IDAO<Split> {
+    private connection: DatabaseConnection;
+    private sqlBuilder: SQLBuilder;
 
-export class SplitDAO {
-    static async create(billItemId: string, assigneeId: string, amount: number): Promise<string> {
-        const query = `INSERT INTO split (bill_item_id, assignee_id, amount) VALUES ($1, $2, $3) RETURNING id;`;
-        const values = [billItemId, assigneeId, amount];
-
-        try {
-            const { rows } = await pool.query(query, values);
-            return rows[0].id;
-        } catch (err) {
-            console.error('Error creating split:', err);
-            throw new Error('Database error');
-        }
+    constructor(databaseFactory: AbstractDatabaseFactory, config: any) {
+        this.connection = databaseFactory.createConnection(config);
+        this.sqlBuilder = databaseFactory.createSQLBuilder();
     }
-
-    static async getByBillItemId(billItemId: string): Promise<any[]> {
-        const query = `SELECT * FROM split WHERE bill_item_id = $1;`;
-
-        try {
-            const { rows } = await pool.query(query, [billItemId]);
-            return rows;
-        } catch (err) {
-            console.error('Error fetching splits:', err);
-            throw new Error('Database error');
-        }
+    create(entity: Omit<Split, "id">): Promise<Split> {
+        throw new Error("Method not implemented.");
     }
-
-    static async delete(splitId: string): Promise<void> {
-        const query = `DELETE FROM split WHERE id = $1;`;
-
-        try {
-            await pool.query(query, [splitId]);
-        } catch (err) {
-            console.error('Error deleting split:', err);
-            throw new Error('Database error');
-        }
+    update(id: string | number, entity: Partial<Split>): Promise<Split> {
+        throw new Error("Method not implemented.");
+    }
+    delete(id: string | number): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    getAll(): Promise<Split[]> {
+        throw new Error("Method not implemented.");
+    }
+    getById(id: string | number): Promise<Split> {
+        throw new Error("Method not implemented.");
     }
 }

@@ -1,14 +1,15 @@
-import { ItemDAO } from "../dao/ItemDAO";
-import { Split } from "./Split"
+import { UUID } from "crypto";
+import { Split } from "./Split";
+
+export enum SplitType {
+    "PERCENTAGE", "SHARES", "AMOUNT"
+}
 
 export class Item {
+    id: UUID;
     name: string;
-    description: string;
     price: number;
     quantity: number;
-
-    static async addToBill(billId: string, item: Item) {
-        return ItemDAO.create(billId, item)
-    }
-
+    splitType: SplitType
+    splits: Split[]
 }

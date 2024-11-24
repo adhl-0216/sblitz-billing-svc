@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   billing-api:
     build: 
@@ -13,7 +11,9 @@ services:
     command: sleep infinity
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
+    networks:
+      - sblitz_default-network
+      - billing-network
 
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
@@ -27,9 +27,21 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    networks:
+      - billing-network
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
 volumes:
   postgres-data:
+
+networks:
+  sblitz_default-network:
+    external: true
+  bill-network:
+    driver: bridge
+    internal: true
+
+
+
