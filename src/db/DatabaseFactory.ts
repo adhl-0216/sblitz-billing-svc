@@ -8,7 +8,7 @@ export interface AbstractDatabaseFactory {
 }
 
 
-class PostgresFactory implements AbstractDatabaseFactory {
+export class PostgresFactory implements AbstractDatabaseFactory {
     createConnection(config: PoolConfig): DatabaseConnection {
         return new PostgresConnection(config);
     }
@@ -28,14 +28,3 @@ class PostgresFactory implements AbstractDatabaseFactory {
 //         return new OracleSQLBuilder();
 //     }
 // }
-
-export function createDatabaseFactory(type: 'postgres' | 'oracle'): AbstractDatabaseFactory {
-    switch (type) {
-        case 'postgres':
-            return new PostgresFactory();
-        case 'oracle':
-            throw new Error('Not implemented');
-        default:
-            throw new Error('Unsupported database type');
-    }
-}

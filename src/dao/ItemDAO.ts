@@ -1,7 +1,7 @@
 import { Item, SplitType } from '../models/Item';
 import { DatabaseConnection } from '@/db/Connection';
 import { SQLBuilder, PostgresSQLBuilder } from '@/db/SqlBuilder';
-import { AbstractDatabaseFactory } from '@/db/Factory';
+import { AbstractDatabaseFactory } from '@/db/DatabaseFactory';
 import { IDAO } from './IDAO';
 import { UUID } from 'crypto';
 

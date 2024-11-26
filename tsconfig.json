@@ -3,7 +3,7 @@
         "outDir": "dist",
         "sourceMap": true,
         "noImplicitAny": true,
-        "moduleResolution": "node",
+        "moduleResolution": "node16",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "baseUrl": ".",
@@ -13,8 +13,16 @@
             ]
         },
         "lib": [
-            "ES2015",
-            "DOM"
-        ]
-    }
+            "ES2022"
+        ],
+        "module": "node16",
+        "target": "es2022",
+        "strict": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

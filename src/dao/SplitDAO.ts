@@ -2,7 +2,7 @@ import { Split } from "@/models/Split";
 import { IDAO } from "./IDAO";
 import { DatabaseConnection } from "@/db/Connection";
 import { SQLBuilder } from "@/db/SqlBuilder";
-import { AbstractDatabaseFactory } from "@/db/Factory";
+import { AbstractDatabaseFactory } from "@/db/DatabaseFactory";
 
 export class SplitDAO implements IDAO<Split> {
     private connection: DatabaseConnection;

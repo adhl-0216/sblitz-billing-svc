@@ -20,41 +20,6 @@ describe('BillService', () => {
         jest.clearAllMocks();
     });
 
-    it('should fetch all bills', async () => {
-        const mockBills: Bill[] = [
-            {
-                id: randomUUID(),
-                title: 'Bill 1',
-                description: 'Description 1',
-                currency: 'USD',
-                total_amount: 100,
-                owner_id: randomUUID(),
-                created_at: new Date(),
-                updated_at: new Date(),
-                items: [],
-                members: []
-            },
-            {
-                id: randomUUID(),
-                title: 'Bill 2',
-                description: 'Description 2',
-                currency: 'USD',
-                total_amount: 200,
-                owner_id: randomUUID(),
-                created_at: new Date(),
-                updated_at: new Date(),
-                items: [],
-                members: []
-            },
-        ];
-
-        billDAOMock.getAll.mockResolvedValue(mockBills);
-
-        const bills = await billService.getAllBills();
-
-        expect(bills).toEqual(mockBills);
-        expect(billDAOMock.getAll).toHaveBeenCalledTimes(1);
-    });
 
     it('should create a new bill', async () => {
         const newBillData = {

@@ -5,27 +5,34 @@ import { UUID } from 'crypto';
 export class BillService {
     constructor(private billDAO: BillDAO) { }
 
+    private async checkOwnership(billId: UUID, userId: string): Promise<void> {
+        const bill = await this.billDAO.getById(billId);
+        if (bill.owner_id !== userId) {
+            throw new Error('Unauthorized access to bill');
+        }
+    }
 
-    async createBill(bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<Bill> {
+    async createBill(userId: string, bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<Bill> {
+        bill.owner_id = userId
         return this.billDAO.create(bill);
     }
-    async getAllBills(): Promise<Bill[]> {
-        return this.billDAO.getAll();
+
+    async getBillsByUserId(userId: string): Promise<Bill[] | null> {
+        return this.billDAO.getBillsByUserId(userId);
     }
 
-    async getBillById(id: UUID): Promise<Bill | null> {
-        return this.billDAO.getById(id);
+    async getBillById(userId: string, billId: UUID): Promise<Bill | null> {
+        await this.checkOwnership(billId, userId);
+        return this.billDAO.getById(billId);
     }
 
-    async getBillsByUserId(user_id: string): Promise<Bill[] | null> {
-        return this.billDAO.getBillsByUserId(user_id);
+    async updateBill(userId: string, billId: UUID, bill: Partial<Bill>): Promise<Bill | null> {
+        await this.checkOwnership(billId, userId);
+        return this.billDAO.update(billId, bill);
     }
 
-    async updateBill(id: string, bill: Partial<Bill>): Promise<Bill | null> {
-        return this.billDAO.update(id, bill);
-    }
-
-    async deleteBill(id: string): Promise<boolean> {
-        return this.billDAO.delete(id);
+    async deleteBill(userId: string, billId: UUID): Promise<boolean> {
+        await this.checkOwnership(billId, userId);
+        return this.billDAO.delete(billId);
     }
 }

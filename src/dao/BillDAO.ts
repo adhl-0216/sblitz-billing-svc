@@ -1,7 +1,7 @@
 import { Bill } from '@/models/Bill';
 import { IDAO } from '@/dao/IDAO';
-import { AbstractDatabaseFactory } from '@/db/Factory';
-import { DatabaseConnection } from '@/db/Connection';
+import { AbstractDatabaseFactory } from '@/db/DatabaseFactory';
+import { ConnectionConfig, DatabaseConnection } from '@/db/Connection';
 import { SQLBuilder } from '@/db/SqlBuilder';
 import { Member } from '@/models/Member';
 import { Item } from '@/models/Item';
@@ -11,7 +11,7 @@ export class BillDAO implements IDAO<Bill> {
     private connection: DatabaseConnection;
     private sqlBuilder: SQLBuilder;
 
-    constructor(databaseFactory: AbstractDatabaseFactory, config: any) {
+    constructor(databaseFactory: AbstractDatabaseFactory, config: ConnectionConfig) {
         this.connection = databaseFactory.createConnection(config);
         this.sqlBuilder = databaseFactory.createSQLBuilder();
     }

@@ -1,6 +1,6 @@
 import { DatabaseConnection } from '@/db/Connection';
 import { SQLBuilder, PostgresSQLBuilder } from '@/db/SqlBuilder';
-import { AbstractDatabaseFactory } from '@/db/Factory';
+import { AbstractDatabaseFactory } from '@/db/DatabaseFactory';
 import { IDAO } from './IDAO';
 import { Member } from '@/models/Member';
 import { UUID } from 'crypto';

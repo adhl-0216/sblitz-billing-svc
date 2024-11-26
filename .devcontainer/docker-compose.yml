@@ -1,5 +1,5 @@
 services:
-  billing-api:
+  bill-api:
     build: 
       context: .
       dockerfile: Dockerfile
@@ -9,6 +9,8 @@ services:
       
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
+    expose:
+      - 5000
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     networks:

@@ -2,11 +2,11 @@ export interface Config {
   port: number
 }
 export const devConfig: Config = {
-  port: 3000,
+  port: 5000,
 };
 
 export const prodConfig = {
-  port: 80,
+  port: 5000,
 };
 
 export const testConfig = {

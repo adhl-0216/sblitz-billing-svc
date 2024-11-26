@@ -1,5 +1,7 @@
 import { Pool, PoolConfig, QueryResult } from 'pg';
 
+export type ConnectionConfig = PoolConfig
+
 export interface DatabaseConnection {
     query(sql: string, params?: any[]): Promise<any>;
     close(): Promise<void>;
@@ -13,10 +15,11 @@ export interface DatabaseTransaction {
 }
 
 export class PostgresConnection implements DatabaseConnection {
+
     private pool: Pool;
 
     constructor(config: PoolConfig) {
-        this.pool = new Pool(config);
+        this.pool = new Pool(config as PoolConfig);
     }
 
     query(sql: string, params?: any[]): Promise<QueryResult> {
