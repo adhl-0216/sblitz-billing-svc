@@ -13,12 +13,11 @@ class BillService {
         }
     }
     async createBill(userId, bill) {
-        bill.owner_id = userId;
+        bill.ownerId = userId;
         return await this.billDAO.create(bill);
     }
     async getBillsByUserId(userId) {
-        let bills = await this.billDAO.getBillsByUserId(userId);
-        return bills;
+        return await this.billDAO.getAll(userId);
     }
     async getBillById(userId, billId) {
         await this.checkOwnership(billId, userId);

@@ -14,15 +14,13 @@ export class BillService {
     }
 
 
-    async createBill(userId: string, bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<Bill> {
-        bill.owner_id = userId
+    async createBill(userId: string, bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<UUID> {
+        bill.ownerId = userId
         return await this.billDAO.create(bill);
     }
 
     async getBillsByUserId(userId: string): Promise<Bill[] | null> {
-        let bills = await this.billDAO.getBillsByUserId(userId) as Bill[];
-
-        return bills
+        return await this.billDAO.getAll(userId) as Bill[];
     }
 
     async getBillById(userId: string, billId: UUID): Promise<Bill | null> {
@@ -30,7 +28,7 @@ export class BillService {
         return await this.billDAO.getById(billId);
     }
 
-    async updateBill(userId: string, billId: UUID, bill: Partial<Bill>): Promise<Bill | null> {
+    async updateBill(userId: string, billId: UUID, bill: Partial<Bill>): Promise<UUID | null> {
         await this.checkOwnership(billId, userId);
         return await this.billDAO.update(billId, bill);
     }

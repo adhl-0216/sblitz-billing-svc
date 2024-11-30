@@ -39,6 +39,7 @@ CREATE TABLE BILL_ITEMS (
     bill_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(12,2) NOT NULL,
+    quantity NUMERIC(12) NOT NULL,
     split_type SPLIT_TYPE NOT NULL DEFAULT 'equal',
     CONSTRAINT pk_bill_items PRIMARY KEY (id),
     CONSTRAINT fk_bill_items_bill FOREIGN KEY (bill_id) REFERENCES BILLS(id) ON DELETE CASCADE

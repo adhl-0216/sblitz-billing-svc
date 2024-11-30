@@ -1,10 +1,12 @@
+import { UUID } from "crypto";
+
 export interface IDAO<T> {
     /**
      * Creates a new entity in the data store.
      * @param entity The entity to be created.
      * @returns A Promise that resolves to the created entity, typically with an assigned ID.
      */
-    create(entity: Omit<T, 'id'>): Promise<T>;
+    create(entity: Omit<T, 'id'>): Promise<UUID>;
 
     /**
      * Updates an existing entity in the data store.
@@ -12,7 +14,7 @@ export interface IDAO<T> {
      * @param entity The updated entity data.
      * @returns A Promise that resolves to the updated entity.
      */
-    update(id: string | number, entity: Partial<T>): Promise<T>;
+    update(id: string | number, entity: Partial<T>): Promise<UUID>;
 
     /**
      * Deletes an entity from the data store.
@@ -25,7 +27,7 @@ export interface IDAO<T> {
      * Retrieves all entities from the data store.
      * @returns A Promise that resolves to an array of all entities.
      */
-    getAll(): Promise<T[]>;
+    getAll({ params }: any): Promise<T[]>;
 
     /**
      * Retrieves a single entity by its unique identifier.

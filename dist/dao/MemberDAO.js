@@ -13,15 +13,14 @@ class MemberDAO {
         const columns = ['color_code'];
         const query = this.sqlBuilder.insert('members', columns);
         const values = [entity.colorCode];
-        const result = await this.connection.query(query, values);
-        return this.mapRowToMember(result.rows[0]);
+        return await this.connection.query(query, values);
     }
     async update(id, entity) {
         const columns = Object.keys(entity);
         const values = Object.values(entity);
         const query = this.sqlBuilder.update('members', columns, 'member_id = $' + (columns.length + 1));
         const result = await this.connection.query(query, [...values, id]);
-        return this.mapRowToMember(result.rows[0]);
+        return result.row.id;
     }
     async delete(id) {
         const query = this.sqlBuilder.delete('members', 'member_id = $1');

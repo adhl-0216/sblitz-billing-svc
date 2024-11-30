@@ -14,22 +14,21 @@ export class MemberDAO implements IDAO<Member> {
         this.sqlBuilder = new PostgresSQLBuilder();
     }
 
-    async create(entity: Omit<Member, 'member_id'>): Promise<Member> {
+    async create(entity: Omit<Member, 'member_id'>): Promise<UUID> {
         const columns = ['color_code'];
         const query = this.sqlBuilder.insert('members', columns);
         const values = [entity.colorCode];
 
-        const result = await this.connection.query(query, values);
-        return this.mapRowToMember(result.rows[0]);
+        return await this.connection.query(query, values);
     }
 
-    async update(id: string | number, entity: Partial<Member>): Promise<Member> {
+    async update(id: string | number, entity: Partial<Member>): Promise<UUID> {
         const columns = Object.keys(entity);
         const values = Object.values(entity);
         const query = this.sqlBuilder.update('members', columns, 'member_id = $' + (columns.length + 1));
 
         const result = await this.connection.query(query, [...values, id]);
-        return this.mapRowToMember(result.rows[0]);
+        return result.row.id
     }
 
     async delete(id: string | number): Promise<boolean> {

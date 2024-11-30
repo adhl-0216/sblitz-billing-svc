@@ -14,22 +14,21 @@ export class ItemDAO implements IDAO<Item> {
         this.sqlBuilder = new PostgresSQLBuilder();
     }
 
-    async create(entity: Omit<Item, 'id'>): Promise<Item> {
+    async create(entity: Omit<Item, 'id'>): Promise<UUID> {
         const columns = ['name', 'price', 'quantity', 'split_type'];
         const query = this.sqlBuilder.insert('items', columns);
         const values = [entity.name, entity.price, entity.quantity, entity.splitType];
 
-        const result = await this.connection.query(query, values);
-        return this.mapRowToItem(result.rows[0]);
+        return await this.connection.query(query, values);
     }
 
-    async update(id: string | number, entity: Partial<Item>): Promise<Item> {
+    async update(id: string | number, entity: Partial<Item>): Promise<UUID> {
         const columns = Object.keys(entity);
         const values = Object.values(entity);
         const query = this.sqlBuilder.update('items', columns, 'id = $' + (columns.length + 1));
 
         const result = await this.connection.query(query, [...values, id]);
-        return this.mapRowToItem(result.rows[0]);
+        return result.row.id
     }
 
     async delete(id: string | number): Promise<boolean> {

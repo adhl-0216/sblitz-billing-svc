@@ -7,10 +7,10 @@ export interface Bill {
     title: string;
     description: string | null;
     currency: string;
-    total_amount: number;
-    owner_id: string;
-    created_at: Date;
-    updated_at: Date;
+    totalAmount: number;
+    ownerId: string;
+    createdAt: Date;
+    updatedAt: Date;
     items: Item[]
     members: Member[]
 }
