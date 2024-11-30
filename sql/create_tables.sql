@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS BILLS CASCADE;
 DROP TYPE IF EXISTS SPLIT_TYPE CASCADE;
 
 -- Recreate the enum type
-CREATE TYPE SPLIT_TYPE AS ENUM ('amount', 'percentage', 'share');
+CREATE TYPE SPLIT_TYPE AS ENUM ('amount', 'percentage', 'share', 'equal');
 
 -- Recreate the BILLS table with the owner_id column
 CREATE TABLE BILLS (
@@ -23,24 +23,25 @@ CREATE TABLE BILLS (
     CONSTRAINT pk_bills PRIMARY KEY (id)
 );
 
+-- Recreate the BILL_MEMBERS table
+CREATE TABLE BILL_MEMBERS (
+    id UUID,
+    bill_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    color_code VARCHAR(7),
+    CONSTRAINT pk_members PRIMARY KEY (id),
+    CONSTRAINT fk_members_bill FOREIGN KEY (bill_id) REFERENCES BILLS(id) ON DELETE CASCADE
+);
+
 -- Recreate the BILL_ITEMS table
 CREATE TABLE BILL_ITEMS (
     id UUID DEFAULT gen_random_uuid(),
     bill_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(12,2) NOT NULL,
-    split_type SPLIT_TYPE NOT NULL,
+    split_type SPLIT_TYPE NOT NULL DEFAULT 'equal',
     CONSTRAINT pk_bill_items PRIMARY KEY (id),
     CONSTRAINT fk_bill_items_bill FOREIGN KEY (bill_id) REFERENCES BILLS(id) ON DELETE CASCADE
-);
-
--- Recreate the BILL_MEMBERS table
-CREATE TABLE BILL_MEMBERS (
-    id UUID,
-    bill_id UUID NOT NULL,
-    color_code VARCHAR(7),
-    CONSTRAINT pk_members PRIMARY KEY (id),
-    CONSTRAINT fk_members_bill FOREIGN KEY (bill_id) REFERENCES BILLS(id) ON DELETE CASCADE
 );
 
 -- Recreate the ITEM_SPLIT table

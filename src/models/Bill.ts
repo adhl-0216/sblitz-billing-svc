@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 import { Item } from "./Item";
 import { Member } from "./Member";
 
-export class Bill {
+export interface Bill {
     id: UUID;
     title: string;
     description: string | null;

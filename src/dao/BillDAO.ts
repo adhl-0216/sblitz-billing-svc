@@ -20,7 +20,6 @@ export class BillDAO implements IDAO<Bill> {
         const transaction = await this.connection.beginTransaction();
 
         try {
-            // Insert bill
             const billColumns = ['title', 'description', 'currency', 'total_amount', 'owner_id'];
             const billSql = this.sqlBuilder.insert('bills', billColumns);
             const billParams = [
@@ -34,18 +33,18 @@ export class BillDAO implements IDAO<Bill> {
             const newBillId = billResult.rows[0].id;
 
             // Insert items
-            const itemColumns = ['bill_id', 'name', 'price', 'split_type'];
+            const itemColumns = ['bill_id', 'name', 'price'];
             const itemSql = this.sqlBuilder.insert('bill_items', itemColumns);
             for (const item of bill.items) {
-                const itemParams = [newBillId, item.name, item.price, item.splitType];
+                const itemParams = [newBillId, item.name, item.price];
                 await transaction.query(itemSql, itemParams);
             }
 
             // Insert members
-            const memberColumns = ['bill_id', 'color_code'];
+            const memberColumns = ['bill_id', 'name', 'color_code'];
             const memberSql = this.sqlBuilder.insert('bill_members', memberColumns);
             for (const member of bill.members) {
-                const memberParams = [newBillId, member.color_code];
+                const memberParams = [newBillId, member.name, member.color_code];
                 await transaction.query(memberSql, memberParams);
             }
 
@@ -131,13 +130,13 @@ export class BillDAO implements IDAO<Bill> {
         return bill;
     }
 
-    private mapRowToBill(row: any): Bill {
+    private mapRowToBill(row: BillMemberRow): Bill {
         return {
             id: row.id,
             title: row.title,
             description: row.description,
             currency: row.currency,
-            total_amount: parseFloat(row.total_amount),
+            total_amount: row.total_amount,
             owner_id: row.owner_id,
             created_at: new Date(row.created_at),
             updated_at: new Date(row.updated_at),
@@ -160,21 +159,64 @@ export class BillDAO implements IDAO<Bill> {
     private mapRowToMember(row: any): Member {
         return {
             member_id: row.id,
+            name: row.name,
             color_code: row.color_code
         };
     }
 
     async getBillsByUserId(userId: string): Promise<Bill[]> {
-        const columns = ['id', 'title', 'description', 'currency', 'total_amount', 'owner_id', 'created_at', 'updated_at'];
-        const sql = this.sqlBuilder.select('bills', columns, 'owner_id = $1');
+        const columns = [
+            'bills.id', 'bills.title', 'bills.description', 'bills.currency',
+            'bills.total_amount', 'bills.owner_id', 'bills.created_at', 'bills.updated_at',
+            'bill_members.id AS member_id', 'bill_members.name', 'bill_members.color_code'
+        ];
+        const sql = `
+        SELECT 
+            ${columns.join(', ')}
+        FROM 
+            bills
+        LEFT JOIN 
+            bill_members ON bill_members.bill_id = bills.id
+        WHERE 
+            bills.owner_id = $1
+    `;
 
         try {
             const res = await this.connection.query(sql, [userId]);
-            return res.rows.map(this.mapRowToBill);
+            const billsMap: Record<string, Bill> = {};
+
+            for (const row of res.rows) {
+                const billId = row.bill_id;
+
+                if (!billsMap[billId]) {
+                    billsMap[billId] = this.mapRowToBill(row);
+                }
+
+                if (row.member_id) {
+                    billsMap[billId].members.push(this.mapRowToMember(row));
+                }
+            }
+
+            return Object.values(billsMap);
         } catch (err) {
             console.error('Error fetching bills:', err);
             throw new Error('Database error');
         }
     }
+}
+
+
+interface BillMemberRow {
+    id: UUID;
+    bill_id: string;
+    name: string;
+    color_code: string | null;
+    title: string;
+    description: string | null;
+    currency: string;
+    total_amount: number;
+    owner_id: string;
+    created_at: string; // ISO date string
+    updated_at: string; // ISO date string
 }
 

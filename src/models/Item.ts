@@ -5,7 +5,7 @@ export enum SplitType {
     "PERCENTAGE", "SHARES", "AMOUNT"
 }
 
-export class Item {
+export interface Item {
     id: UUID;
     name: string;
     price: number;
