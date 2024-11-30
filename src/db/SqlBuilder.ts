@@ -3,7 +3,9 @@ export interface SQLBuilder {
     update(table: string, columns: string[], whereClause: string): string;
     delete(table: string, whereClause: string): string;
     select(table: string, columns: string[], whereClause?: string): string;
+    truncate(table: string, whereClause?: string): string;  // Add truncate method
 }
+
 
 export class PostgresSQLBuilder implements SQLBuilder {
     insert(table: string, columns: string[]): string {
@@ -24,7 +26,13 @@ export class PostgresSQLBuilder implements SQLBuilder {
         const baseQuery = `SELECT ${columns.join(', ')} FROM ${table}`;
         return whereClause ? `${baseQuery} WHERE ${whereClause}` : baseQuery;
     }
+
+    truncate(table: string, whereClause?: string): string {
+        const query = `TRUNCATE TABLE ${table}`;
+        return whereClause ? `${query} WHERE ${whereClause}` : query;
+    }
 }
+
 
 
 

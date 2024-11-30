@@ -5,12 +5,14 @@ import { UUID } from 'crypto';
 export class BillService {
     constructor(private billDAO: BillDAO) { }
 
-    private async checkOwnership(billId: UUID, userId: string): Promise<void> {
-        const bill = await this.billDAO.getById(billId);
-        if (bill.owner_id !== userId) {
+    private async checkOwnership(billId: string, userId: string): Promise<void> {
+        const isOwner = await this.billDAO.validateOwnership(billId, userId);
+
+        if (!isOwner) {
             throw new Error('Unauthorized access to bill');
         }
     }
+
 
     async createBill(userId: string, bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<Bill> {
         bill.owner_id = userId

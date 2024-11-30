@@ -1,17 +1,20 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 
+dotenv.config();
+
 import splitRoutes from '@/routes/SplitRoutes';
 import billRoutes from '@/routes/BillRoutes';
 import { Config, prodConfig } from '@/util';
 import { corsMiddleware, protectedRoutesMiddleware } from '@/middleware';
 
-dotenv.config();
 
 export const AppFactory = (config: Config = prodConfig) => {
   const app = express();
   const PORT = config.port || 5000;
 
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use(corsMiddleware())
 
   app.get("/hello", (req: Request, res: Response) => {

@@ -10,19 +10,21 @@
         "paths": {
             "@/*": [
                 "src/*"
-            ]
+            ] // This tells TypeScript to resolve `@/` to `src/`
         },
         "lib": [
             "ES2022"
         ],
         "module": "node16",
         "target": "es2022",
-        "strict": true,
+        "strict": true
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "test/**/*",
+        "dist",
     ]
 }
