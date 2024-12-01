@@ -46,26 +46,105 @@ class BillDAO {
             throw new Error('Failed to create bill with items and members');
         }
     }
-    async update(id, updatedData) {
-        const columns = ['title', 'description', 'currency', 'total_amount', 'updated_at'];
-        const sql = this.sqlBuilder.update('bills', columns, 'id = $6');
-        const params = [
-            updatedData.title,
-            updatedData.description,
-            updatedData.currency,
-            updatedData.totalAmount,
-            'CURRENT_TIMESTAMP',
-            id
-        ];
+    async update(billId, bill) {
+        const transaction = await this.connection.beginTransaction();
         try {
-            const res = await this.connection.query(sql, params);
-            if (res.rows.length === 0) {
-                throw new Error('Bill not found');
+            // Handle `bill_members`
+            if (bill.members) {
+                for (const member of bill.members) {
+                    const memberExistsSql = this.sqlBuilder.select('bill_members', ['id'], 'id = $1');
+                    const exists = await transaction.query(memberExistsSql, [member.id]);
+                    if (exists.rowCount > 0) {
+                        // Update existing member
+                        const memberColumns = ['name', 'color_code'];
+                        const memberUpdateSql = this.sqlBuilder.update('bill_members', memberColumns, 'id = $3');
+                        await transaction.query(memberUpdateSql, [member.name, member.colorCode, member.id]);
+                    }
+                    else {
+                        // Insert new member
+                        const memberColumns = ['id', 'bill_id', 'name', 'color_code'];
+                        const memberInsertSql = this.sqlBuilder.insert('bill_members', memberColumns);
+                        await transaction.query(memberInsertSql, [member.id, billId, member.name, member.colorCode]);
+                    }
+                }
+                // Remove members not present in the updated data
+                const memberIds = bill.members.map((member) => member.id);
+                const deleteOldMembersSql = `
+                DELETE FROM bill_members
+                WHERE bill_id = $1 AND id NOT IN (${memberIds.map((_, i) => `$${i + 2}`).join(', ')})
+            `;
+                await transaction.query(deleteOldMembersSql, [billId, ...memberIds]);
             }
-            return res.row.id;
+            // Handle `bill_items`
+            if (bill.items) {
+                for (const item of bill.items) {
+                    const itemExistsSql = this.sqlBuilder.select('bill_items', ['id'], 'id = $1');
+                    const exists = await transaction.query(itemExistsSql, [item.id]);
+                    if (exists.rowCount > 0) {
+                        // Update existing item
+                        const itemColumns = ['name', 'price', 'quantity', 'split_type'];
+                        const itemUpdateSql = this.sqlBuilder.update('bill_items', itemColumns, 'id = $5');
+                        await transaction.query(itemUpdateSql, [
+                            item.name,
+                            item.price,
+                            item.quantity,
+                            item.splitType,
+                            item.id,
+                        ]);
+                    }
+                    else {
+                        // Insert new item
+                        const itemColumns = ['id', 'bill_id', 'name', 'price', 'quantity', 'split_type'];
+                        const itemInsertSql = this.sqlBuilder.insert('bill_items', itemColumns);
+                        const itemRes = await transaction.query(itemInsertSql, [
+                            item.id,
+                            billId,
+                            item.name,
+                            item.price,
+                            item.quantity,
+                            item.splitType,
+                        ]);
+                        const itemId = itemRes.rows[0].id;
+                        // // Handle `item_split` if present
+                        // if (item.splits) {
+                        //     for (const split of item.splits) {
+                        //         const splitColumns = ['id', 'bill_item_id', 'assignee_id', 'split_value'];
+                        //         const splitInsertSql = this.sqlBuilder.insert('item_split', splitColumns);
+                        //         await transaction.query(splitInsertSql, [split.id, itemId, split.assigneeId, split.splitValue]);
+                        //     }
+                        // }
+                    }
+                }
+                // Remove items not present in the updated data
+                const itemIds = bill.items.map((item) => item.id);
+                const deleteOldItemsSql = `
+                DELETE FROM bill_items
+                WHERE bill_id = $1 AND id NOT IN (${itemIds.map((_, i) => `$${i + 2}`).join(', ')})
+            `;
+                await transaction.query(deleteOldItemsSql, [billId, ...itemIds]);
+            }
+            // Update the `bills` table
+            const billColumns = ['title', 'description', 'currency', 'total_amount'];
+            const billSql = `UPDATE bills 
+            SET 
+                ${billColumns.map((col, i) => `${col} = $${i + 1}`).join(', ')}, 
+                updated_at = CURRENT_TIMESTAMP 
+            WHERE id = $${billColumns.length + 1}
+            RETURNING id`;
+            const billParams = [
+                bill.title,
+                bill.description,
+                bill.currency,
+                bill.totalAmount,
+                billId,
+            ];
+            await transaction.query(billSql, billParams);
+            await transaction.commit();
+            return billId;
         }
-        catch (err) {
-            console.error('Error updating bill:', err);
+        catch (error) {
+            await transaction.rollback();
+            console.error('Error updating bill:', error);
             throw new Error('Database error');
         }
     }
@@ -126,6 +205,8 @@ class BillDAO {
                 return null;
             }
             const billsMap = {};
+            const membersMap = new Map();
+            const itemsMap = new Map();
             for (const row of res.rows) {
                 const billId = row.bill_id;
                 if (!billsMap[billId]) {
@@ -134,7 +215,7 @@ class BillDAO {
                         title: row.title,
                         description: row.description,
                         currency: row.currency,
-                        totalAmount: row.total_amount,
+                        totalAmount: parseFloat(row.total_amount),
                         ownerId: row.owner_id,
                         createdAt: row.created_at,
                         updatedAt: row.updated_at,
@@ -142,28 +223,30 @@ class BillDAO {
                         members: []
                     };
                 }
-                if (row.member_id) {
+                if (row.member_id && !membersMap.has(row.member_id)) {
                     const member = {
                         id: row.member_id,
                         name: row.member_name,
                         colorCode: row.member_color_code
                     };
-                    billsMap[billId].members.push(member);
+                    membersMap.set(row.member_id, member);
                 }
-                if (row.item_id) {
+                if (row.item_id && !itemsMap.has(row.item_id)) {
                     const item = {
                         id: row.item_id,
                         name: row.item_name,
-                        price: row.item_price,
-                        quantity: row.item_quantity,
+                        price: parseFloat(row.item_price),
+                        quantity: parseInt(row.item_quantity),
                         splitType: row.item_split_type,
                         splits: []
                     };
-                    billsMap[billId].items.push(item);
+                    itemsMap.set(row.item_id, item);
                 }
             }
-            console.log(Object.values(billsMap)[0]);
-            return Object.values(billsMap)[0];
+            const bill = Object.values(billsMap)[0];
+            bill.members = Array.from(membersMap.values());
+            bill.items = Array.from(itemsMap.values());
+            return bill;
         }
         catch (err) {
             console.error('Error fetching bill by ID:', err);

@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS BILLS CASCADE;
 DROP TYPE IF EXISTS SPLIT_TYPE CASCADE;
 
 -- Recreate the enum type
-CREATE TYPE SPLIT_TYPE AS ENUM ('amount', 'percentage', 'share', 'equal');
+CREATE TYPE SPLIT_TYPE AS ENUM ('AMOUNT', 'PERCENTAGE', 'SHARE', 'EQUAL');
 
 -- Recreate the BILLS table with the owner_id column
 CREATE TABLE BILLS (
@@ -40,13 +40,13 @@ CREATE TABLE BILL_ITEMS (
     name VARCHAR(255) NOT NULL,
     price NUMERIC(12,2) NOT NULL,
     quantity NUMERIC(12) NOT NULL,
-    split_type SPLIT_TYPE NOT NULL DEFAULT 'equal',
+    split_type SPLIT_TYPE NOT NULL DEFAULT 'EQUAL',
     CONSTRAINT pk_bill_items PRIMARY KEY (id),
     CONSTRAINT fk_bill_items_bill FOREIGN KEY (bill_id) REFERENCES BILLS(id) ON DELETE CASCADE
 );
 
 -- Recreate the ITEM_SPLIT table
-CREATE TABLE ITEM_SPLIT (
+CREATE TABLE ITEM_SPLITS (
     id UUID DEFAULT gen_random_uuid(),
     bill_item_id UUID NOT NULL,
     assignee_id UUID NOT NULL,
@@ -59,5 +59,5 @@ CREATE TABLE ITEM_SPLIT (
 -- Recreate indexes
 CREATE INDEX idx_bill_items_bill_id ON BILL_ITEMS(bill_id);
 CREATE INDEX idx_bill_members_bill_id ON BILL_MEMBERS(bill_id);
-CREATE INDEX idx_item_split_bill_item_id ON ITEM_SPLIT(bill_item_id);
-CREATE INDEX idx_item_split_assignee_id ON ITEM_SPLIT(assignee_id);
+CREATE INDEX idx_item_split_bill_item_id ON ITEM_SPLITS(bill_item_id);
+CREATE INDEX idx_item_split_assignee_id ON ITEM_SPLITS(assignee_id);
