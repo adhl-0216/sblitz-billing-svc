@@ -9,7 +9,7 @@
         "baseUrl": ".",
         "paths": {
             "@/*": [
-                "src/*"
+                "./src/*"
             ] // This tells TypeScript to resolve `@/` to `src/`
         },
         "lib": [
@@ -21,10 +21,10 @@
     },
     "include": [
         "src/**/*",
+        "test/**/*",
     ],
     "exclude": [
         "node_modules",
-        "test/**/*",
         "dist",
     ]
 }

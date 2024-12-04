@@ -2,7 +2,10 @@ import { UUID } from "crypto";
 import { Split } from "./Split";
 
 export enum SplitType {
-    "PERCENTAGE", "SHARES", "AMOUNT", "EQUAL"
+    PERCENTAGE = "PERCENTAGE",
+    EQUAL = "EQUAL",
+    AMOUNT = "AMOUNT",
+    SHARES = "SHARES",
 }
 
 export interface Item {

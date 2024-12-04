@@ -16,7 +16,7 @@ export class BillDAO implements IDAO<Bill> {
         this.sqlBuilder = databaseFactory.createSQLBuilder();
     }
 
-    async create(bill: Omit<Bill, 'id' | 'created_at' | 'updated_at'>): Promise<UUID> {
+    async create(bill: Omit<Bill, 'id' | 'createdAt' | 'updatedAt'>): Promise<UUID> {
 
         const transaction = await this.connection.beginTransaction();
 
@@ -124,7 +124,7 @@ export class BillDAO implements IDAO<Bill> {
                             item.splitType,
                         ]);
 
-                        const itemId = itemRes.rows[0].id;
+                        // const itemId = itemRes.rows[0].id;
 
                         // // Handle `item_split` if present
                         // if (item.splits) {
