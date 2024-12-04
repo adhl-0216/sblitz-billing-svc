@@ -2,19 +2,19 @@ import { Pool, PoolConfig, QueryResult } from 'pg';
 
 export type ConnectionConfig = PoolConfig
 
-export interface DatabaseConnection {
+export interface IDatabaseConnection {
     query(sql: string, params?: any[]): Promise<any>;
     close(): Promise<void>;
-    beginTransaction(): Promise<DatabaseTransaction>;
+    beginTransaction(): Promise<IDatabaseTransaction>;
 }
 
-export interface DatabaseTransaction {
+export interface IDatabaseTransaction {
     query(sql: string, params?: any[]): Promise<any>;
     commit(): Promise<void>;
     rollback(): Promise<void>;
 }
 
-export class PostgresConnection implements DatabaseConnection {
+export class PostgresConnection implements IDatabaseConnection {
 
     private pool: Pool;
 
@@ -30,7 +30,7 @@ export class PostgresConnection implements DatabaseConnection {
         return this.pool.end();
     }
 
-    async beginTransaction(): Promise<DatabaseTransaction> {
+    async beginTransaction(): Promise<IDatabaseTransaction> {
         const client = await this.pool.connect();
         await client.query('BEGIN');
 

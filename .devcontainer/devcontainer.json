@@ -18,7 +18,19 @@
 	"forwardPorts": [
 		5000,
 		5432
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"phind.phind",
+				"VisualStudioExptTeam.vscodeintellicode-insiders",
+				"VisualStudioExptTeam.vscodeintellicode-completions",
+				"VisualStudioExptTeam.intellicode-api-usage-examples",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"ms-dotnettools.vscode-dotnet-runtime"
+			]
+		}
+	}
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
 	// Configure tool-specific properties.

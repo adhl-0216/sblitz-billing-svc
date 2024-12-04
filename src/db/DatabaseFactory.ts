@@ -1,19 +1,19 @@
-import { PostgresSQLBuilder, SQLBuilder } from "@/db/SqlBuilder";
+import { PostgresSQLBuilder, ISQLBuilder } from "@/db/SqlBuilder";
 import { PoolConfig } from 'pg';
-import { DatabaseConnection, PostgresConnection } from "./Connection";
+import { IDatabaseConnection, PostgresConnection } from "./Connection";
 
-export interface AbstractDatabaseFactory {
-    createConnection(config: any): DatabaseConnection;
-    createSQLBuilder(): SQLBuilder;
+export interface IAbstractDatabaseFactory {
+    createConnection(config: any): IDatabaseConnection;
+    createSQLBuilder(): ISQLBuilder;
 }
 
 
-export class PostgresFactory implements AbstractDatabaseFactory {
-    createConnection(config: PoolConfig): DatabaseConnection {
+export class PostgresFactory implements IAbstractDatabaseFactory {
+    createConnection(config: PoolConfig): IDatabaseConnection {
         return new PostgresConnection(config);
     }
 
-    createSQLBuilder(): SQLBuilder {
+    createSQLBuilder(): ISQLBuilder {
         return new PostgresSQLBuilder();
     }
 }

@@ -1,15 +1,15 @@
 import { Item, SplitType } from '../models/Item';
-import { DatabaseConnection } from '@/db/Connection';
-import { SQLBuilder, PostgresSQLBuilder } from '@/db/SqlBuilder';
-import { AbstractDatabaseFactory } from '@/db/DatabaseFactory';
+import { IDatabaseConnection } from '@/db/Connection';
+import { ISQLBuilder, PostgresSQLBuilder } from '@/db/SqlBuilder';
+import { IAbstractDatabaseFactory } from '@/db/DatabaseFactory';
 import { IDAO } from './IDAO';
 import { UUID } from 'crypto';
 
 export class ItemDAO implements IDAO<Item> {
-    private connection: DatabaseConnection;
-    private sqlBuilder: SQLBuilder;
+    private connection: IDatabaseConnection;
+    private sqlBuilder: ISQLBuilder;
 
-    constructor(databaseFactory: AbstractDatabaseFactory, config: any) {
+    constructor(databaseFactory: IAbstractDatabaseFactory, config: any) {
         this.connection = databaseFactory.createConnection(config);
         this.sqlBuilder = new PostgresSQLBuilder();
     }
@@ -37,7 +37,7 @@ export class ItemDAO implements IDAO<Item> {
         return result.rowCount > 0;
     }
 
-    async getAll(): Promise<Item[]> {
+    async getAllByUserId(): Promise<Item[]> {
         const query = this.sqlBuilder.select('items', ['*']);
         const result = await this.connection.query(query);
         return result.rows.map(this.mapRowToItem);

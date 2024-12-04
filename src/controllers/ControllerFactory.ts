@@ -4,12 +4,12 @@ import { BillDAO } from '@/dao/BillDAO';
 import { PostgresFactory } from '@/db/DatabaseFactory';
 import { ConnectionConfig } from '@/db/Connection';
 
-export interface AbstractControllerFactory<T> {
+export interface IAbstractControllerFactory<T> {
     createController(connectionConfig: ConnectionConfig): T;
 }
 
 
-export class BillControllerFactory implements AbstractControllerFactory<BillController> {
+export class BillControllerFactory implements IAbstractControllerFactory<BillController> {
     createController(connectionConfig: ConnectionConfig): BillController {
         const postgresFactory = new PostgresFactory()
         const billDAO = new BillDAO(postgresFactory, connectionConfig);

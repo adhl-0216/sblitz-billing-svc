@@ -1,15 +1,15 @@
 import { Split } from "@/models/Split";
 import { IDAO } from "./IDAO";
-import { DatabaseConnection } from "@/db/Connection";
-import { SQLBuilder } from "@/db/SqlBuilder";
-import { AbstractDatabaseFactory } from "@/db/DatabaseFactory";
+import { IDatabaseConnection } from "@/db/Connection";
+import { ISQLBuilder } from "@/db/SqlBuilder";
+import { IAbstractDatabaseFactory } from "@/db/DatabaseFactory";
 import { UUID } from "crypto";
 
 export class SplitDAO implements IDAO<Split> {
-    private connection: DatabaseConnection;
-    private sqlBuilder: SQLBuilder;
+    private connection: IDatabaseConnection;
+    private sqlBuilder: ISQLBuilder;
 
-    constructor(databaseFactory: AbstractDatabaseFactory, config: any) {
+    constructor(databaseFactory: IAbstractDatabaseFactory, config: any) {
         this.connection = databaseFactory.createConnection(config);
         this.sqlBuilder = databaseFactory.createSQLBuilder();
     }
@@ -22,7 +22,7 @@ export class SplitDAO implements IDAO<Split> {
     delete(id: string | number): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    getAll(): Promise<Split[]> {
+    getAllByUserId(): Promise<Split[]> {
         throw new Error("Method not implemented.");
     }
     getById(id: string | number): Promise<Split> {

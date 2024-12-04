@@ -5,13 +5,12 @@ dotenv.config();
 
 import splitRoutes from '@/routes/SplitRoutes';
 import billRoutes from '@/routes/BillRoutes';
-import { Config, prodConfig } from '@/util';
 import { corsMiddleware, protectedRoutesMiddleware } from '@/middleware';
 
 
-export const AppFactory = (config: Config = prodConfig) => {
+export const AppFactory = () => {
   const app = express();
-  const PORT = config.port || 5000;
+  const PORT = 5000;
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));

@@ -1,17 +1,17 @@
 import { Bill } from '@/models/Bill';
 import { IDAO } from '@/dao/IDAO';
-import { AbstractDatabaseFactory } from '@/db/DatabaseFactory';
-import { ConnectionConfig, DatabaseConnection } from '@/db/Connection';
-import { SQLBuilder } from '@/db/SqlBuilder';
+import { IAbstractDatabaseFactory } from '@/db/DatabaseFactory';
+import { ConnectionConfig, IDatabaseConnection } from '@/db/Connection';
+import { ISQLBuilder } from '@/db/SqlBuilder';
 import { Member } from '@/models/Member';
 import { Item, SplitType } from '@/models/Item';
 import { randomUUID, UUID } from 'crypto';
 
 export class BillDAO implements IDAO<Bill> {
-    private connection: DatabaseConnection;
-    private sqlBuilder: SQLBuilder;
+    private connection: IDatabaseConnection;
+    private sqlBuilder: ISQLBuilder;
 
-    constructor(databaseFactory: AbstractDatabaseFactory, config: ConnectionConfig) {
+    constructor(databaseFactory: IAbstractDatabaseFactory, config: ConnectionConfig) {
         this.connection = databaseFactory.createConnection(config);
         this.sqlBuilder = databaseFactory.createSQLBuilder();
     }
@@ -173,19 +173,19 @@ export class BillDAO implements IDAO<Bill> {
         }
     }
 
-    async delete(id: string): Promise<boolean> {
+    async delete(billId: UUID): Promise<boolean> {
         const transaction = await this.connection.beginTransaction();
 
         try {
-            const sqlTruncateItemSplit = this.sqlBuilder.delete('item_split', `bill_item_id IN (SELECT id FROM bill_items WHERE bill_id = $1)`);
-            await transaction.query(sqlTruncateItemSplit, [id]); // Truncate the item_split table first
-            const sqlTruncateBillItems = this.sqlBuilder.delete('bill_items', 'bill_id = $1');
-            await transaction.query(sqlTruncateBillItems, [id]); // Then truncate the bill_items table
-            const sqlTruncateBillMembers = this.sqlBuilder.delete('bill_members', 'bill_id = $1');
-            await transaction.query(sqlTruncateBillMembers, [id]); // Then truncate the bill_members table
+            // const sqlTruncateItemSplit = this.sqlBuilder.delete('item_split', `bill_item_id IN (SELECT id FROM bill_items WHERE bill_id = $1)`);
+            // await transaction.query(sqlTruncateItemSplit, [id]); // Truncate the item_split table first
+            const sqlDeleteItems = this.sqlBuilder.delete('bill_items', 'bill_id = $1');
+            await transaction.query(sqlDeleteItems, [billId]); // Then truncate the bill_items table
+            const sqlDeleteMembers = this.sqlBuilder.delete('bill_members', 'bill_id = $1');
+            await transaction.query(sqlDeleteMembers, [billId]); // Then truncate the bill_members table
 
             const sqlDeleteBill = this.sqlBuilder.delete('bills', 'id = $1');
-            const res = await transaction.query(sqlDeleteBill, [id]);
+            const res = await transaction.query(sqlDeleteBill, [billId]);
 
             await transaction.commit();
 
@@ -197,7 +197,8 @@ export class BillDAO implements IDAO<Bill> {
         }
     }
 
-    async getById(id: string): Promise<Bill | null> {
+    async getById(billId: UUID): Promise<Bill | null> {
+
         const columns = [
             'bills.id AS bill_id',
             'bills.title',
@@ -231,7 +232,7 @@ export class BillDAO implements IDAO<Bill> {
     `;
 
         try {
-            const res = await this.connection.query(sql, [id]);
+            const res = await this.connection.query(sql, [billId]);
 
             if (res.rows.length === 0) {
                 return null;
@@ -292,7 +293,7 @@ export class BillDAO implements IDAO<Bill> {
         }
     }
 
-    async getAll(userId: string): Promise<Bill[]> {
+    async getAllByUserId(userId: string): Promise<Bill[]> {
         const sql =
             `SELECT
             bills.id AS bill_id, 
@@ -351,7 +352,7 @@ export class BillDAO implements IDAO<Bill> {
         }
     }
 
-    async validateOwnership(billId: string, userId: string): Promise<boolean> {
+    async validateOwnership(billId: UUID, userId: string): Promise<boolean> {
         const sql = `
         SELECT COUNT(*) 
         FROM bills

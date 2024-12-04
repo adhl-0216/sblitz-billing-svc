@@ -1,13 +1,12 @@
-export interface SQLBuilder {
+export interface ISQLBuilder {
     insert(table: string, columns: string[]): string;
     update(table: string, columns: string[], whereClause: string): string;
     delete(table: string, whereClause: string): string;
     select(table: string, columns: string[], whereClause?: string): string;
-    truncate(table: string, whereClause?: string): string;  // Add truncate method
 }
 
 
-export class PostgresSQLBuilder implements SQLBuilder {
+export class PostgresSQLBuilder implements ISQLBuilder {
     insert(table: string, columns: string[]): string {
         const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
         return `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`;
@@ -25,11 +24,6 @@ export class PostgresSQLBuilder implements SQLBuilder {
     select(table: string, columns: string[], whereClause?: string): string {
         const baseQuery = `SELECT ${columns.join(', ')} FROM ${table}`;
         return whereClause ? `${baseQuery} WHERE ${whereClause}` : baseQuery;
-    }
-
-    truncate(table: string, whereClause?: string): string {
-        const query = `TRUNCATE TABLE ${table}`;
-        return whereClause ? `${query} WHERE ${whereClause}` : query;
     }
 }
 

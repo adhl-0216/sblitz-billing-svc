@@ -5,7 +5,7 @@ import { UUID } from 'crypto';
 export class BillService {
     constructor(private billDAO: BillDAO) { }
 
-    private async checkOwnership(billId: string, userId: string): Promise<void> {
+    private async checkOwnership(billId: UUID, userId: string): Promise<void> {
         const isOwner = await this.billDAO.validateOwnership(billId, userId);
 
         if (!isOwner) {
@@ -20,7 +20,7 @@ export class BillService {
     }
 
     async getBillsByUserId(userId: string): Promise<Bill[] | null> {
-        return await this.billDAO.getAll(userId) as Bill[];
+        return await this.billDAO.getAllByUserId(userId) as Bill[];
     }
 
     async getBillById(userId: string, billId: UUID): Promise<Bill | null> {
