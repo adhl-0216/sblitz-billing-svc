@@ -81,6 +81,7 @@ erDiagram
 
     BILL_MEMBERS {
         UUID id PK
+        VARCHAR name
         UUID bill_id FK
         VARCHAR color_code
     }
