@@ -9,22 +9,21 @@
         "baseUrl": ".",
         "paths": {
             "@/*": [
-                "./src/*"
-            ] // This tells TypeScript to resolve `@/` to `src/`
+                "src/*"
+            ]
         },
         "lib": [
             "ES2022"
         ],
-        "module": "node16",
+        "module": "Node16",
         "target": "es2022",
         "strict": true
     },
     "include": [
-        "src/**/*",
-        "test/**/*",
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",
-        "dist",
+        "dist"
     ]
 }

@@ -19,6 +19,6 @@ COPY --from=builder /app/dist ./dist
 
 RUN npm install --only=production
 
-EXPOSE 3000
+EXPOSE 5000
 
 CMD ["npm", "start"]
