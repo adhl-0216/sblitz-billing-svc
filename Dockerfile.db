@@ -1,0 +1,11 @@
+FROM postgres:latest
+
+# Create a directory for initialization scripts
+# COPY the SQL script into the image
+COPY ./sql/create_tables.sql /docker-entrypoint-initdb.d/
+
+# The scripts in /docker-entrypoint-initdb.d/ are executed on the first run
+# No additional commands are needed; postgres will automatically execute the script.
+
+# Expose PostgreSQL's default port
+EXPOSE 5432
